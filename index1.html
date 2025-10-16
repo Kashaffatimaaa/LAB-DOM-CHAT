@@ -54,6 +54,14 @@
     text-align: left;
   }
 
+  .error {
+    background: #ffb3b3;
+    color: #6b0000;
+    align-self: center;
+    text-align: center;
+    font-style: italic;
+  }
+
   .input-area {
     display: flex;
     border-top: 2px solid #e0b0ff;
@@ -110,7 +118,13 @@
 
   function appendMessage(msg) {
     const msgDiv = document.createElement("div");
-    msgDiv.classList.add("message", msg.sender === "User" ? "user" : "bot");
+    msgDiv.classList.add("message");
+
+    // Add class dynamically based on sender
+    if (msg.sender === "User") msgDiv.classList.add("user");
+    else if (msg.sender === "Bot") msgDiv.classList.add("bot");
+    else msgDiv.classList.add("error");
+
     msgDiv.innerHTML = `<p>${msg.text}</p><small>${msg.time}</small>`;
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
@@ -119,15 +133,17 @@
   function sendMessage() {
     const input = document.getElementById("userInput");
     const text = input.value.trim();
+
     try {
-      if (!text) throw "Message cannot be empty!";
+      if (!text) throw new Error("⚠️ You can’t send an empty message!");
       const userMsg = new Message(text, "User");
       messages.push(userMsg);
       appendMessage(userMsg);
       input.value = "";
       setTimeout(() => botReply(text), 1000);
     } catch (err) {
-      alert(err);
+      const errorMsg = new Message(err.message, "Error");
+      appendMessage(errorMsg);
     }
   }
 
@@ -142,41 +158,33 @@
   function getBotReply(text) {
     const msg = text.toLowerCase();
     
-    // greetings
     if (msg.includes("hi") || msg.includes("hello") || msg.includes("hey"))
       return "Hey there 💜 how’s your day going?";
-    
-    // mood detection
+    if (msg.includes("how are you"))
+      return "I’m a mix of sass and serotonin 😏✨";
     if (msg.includes("sad") || msg.includes("depressed"))
-      return "Aww 💔 sending you virtual hugs and sparkles ✨";
+      return "Aww 💔 sending you sparkles and hugs ✨";
     if (msg.includes("happy") || msg.includes("great"))
-      return "That’s amazing! Keep shining 🌟";
+      return "That’s amazing! Keep glowing 🌸";
     if (msg.includes("angry") || msg.includes("mad"))
-      return "Take a deep breath 😮‍💨 wanna talk about it?";
-    
-    // curiosity
+      return "Deep breath 😮‍💨 wanna rant about it?";
     if (msg.includes("why") || msg.includes("how"))
-      return "Good question 🤔 I’d say it’s a mix of fate and caffeine.";
-    
-    // fun facts
+      return "Good question 🤔 Maybe it’s just human nature!";
     if (msg.includes("roman empire"))
-      return "Fun fact 🏛️: The Romans invented concrete and built aqueducts that still stand!";
+      return "Fun fact 🏛️: The Romans invented concrete!";
     if (msg.includes("space"))
-      return "Space? ✨ My favorite! Did you know a day on Venus is longer than a year there?";
-    
-    // farewell
+      return "Did you know? A day on Venus is longer than a year there ✨";
     if (msg.includes("bye") || msg.includes("goodnight"))
       return "Aww leaving already? 💔 Sweet dreams 💫";
-    
-    // witty default
-    const replies = [
+
+    const wittyReplies = [
       "That’s interesting 💭 tell me more!",
       "Haha, you’re funny 😏",
-      "You sound mysterious 👀",
+      "You're so cool 👀",
       "I totally get you 💅",
       "I’d agree… if I wasn’t a bot 😌"
     ];
-    return replies[Math.floor(Math.random() * replies.length)];
+    return wittyReplies[Math.floor(Math.random() * wittyReplies.length)];
   }
 </script>
 
